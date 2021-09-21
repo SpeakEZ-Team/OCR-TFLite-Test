@@ -11,6 +11,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.speech.tts.TextToSpeech;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -23,6 +24,7 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
+import java.util.Locale;
 
 import org.tensorflow.lite.support.common.TensorProcessor;
 import org.tensorflow.lite.support.image.ImageProcessor;
@@ -41,6 +43,7 @@ public class MainActivity extends AppCompatActivity {
     InputStream istr;
     private TensorBuffer outputProbabilityBuffer;
     TextView lbl;
+    TextToSpeech speaker;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,6 +62,15 @@ public class MainActivity extends AppCompatActivity {
         button.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 runInference();
+            }
+        });
+
+        speaker=new TextToSpeech(getApplicationContext(), new TextToSpeech.OnInitListener() {
+            @Override
+            public void onInit(int status) {
+                if(status != TextToSpeech.ERROR) {
+                    speaker.setLanguage(Locale.US);
+                }
             }
         });
 
@@ -120,6 +132,7 @@ public class MainActivity extends AppCompatActivity {
         String predict_s = sb.toString();
 
         lbl.setText(predict_s);
+        speaker.speak(predict_s, TextToSpeech.QUEUE_FLUSH, null);
 
     }
 
